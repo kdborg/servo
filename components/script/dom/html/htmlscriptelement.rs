@@ -224,6 +224,9 @@ pub(crate) enum ScriptType {
     Classic,
     Module,
     ImportMap,
+    /// `type="text/mersey"`: run the source in the embedded Mersey engine
+    /// (native leg of bench/web). Inline only, mirroring the Gecko fork.
+    Mersey,
 }
 
 /// <https://html.spec.whatwg.org/multipage/#steps-to-run-when-the-result-is-ready>
@@ -847,6 +850,8 @@ impl HTMLScriptElement {
                     );
                 },
                 ScriptType::ImportMap => (),
+                // External Mersey scripts are not supported (inline only).
+                ScriptType::Mersey => (),
             }
         } else {
             // Step 32. If el does not have a src content attribute:
@@ -936,6 +941,12 @@ impl HTMLScriptElement {
 
                     // Step 34.3
                     self.execute(cx, Ok(script));
+                    return;
+                },
+                ScriptType::Mersey => {
+                    // Run the inline source directly in the embedded Mersey engine
+                    // (native leg of bench/web). No classic/module machinery.
+                    crate::mersey::run_mersey_script(global, cx, &text);
                     return;
                 },
             }
@@ -1085,6 +1096,10 @@ impl HTMLScriptElement {
 
                 if ty.to_ascii_lowercase().trim_matches(HTML_SPACE_CHARACTERS) == "importmap" {
                     return Some(ScriptType::ImportMap);
+                }
+
+                if ty.to_ascii_lowercase().trim_matches(HTML_SPACE_CHARACTERS) == "text/mersey" {
+                    return Some(ScriptType::Mersey);
                 }
 
                 if SCRIPT_JS_MIMES
