@@ -42,6 +42,7 @@ pub(crate) mod document_collection;
 pub(crate) mod iframe_collection;
 pub(crate) mod image_animation;
 pub mod layout_dom;
+pub(crate) mod mersey;
 pub(crate) mod messaging;
 mod microtask;
 pub(crate) mod mime;

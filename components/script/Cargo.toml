@@ -40,6 +40,7 @@ webxr = ["gamepad", "webxr-api", "script_bindings/webxr"]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(crown)'] }
 
 [dependencies]
+mersey_capi = { path = "../../../mersey/crates/mersey_capi" }
 aes = { workspace = true }
 aes-gcm = { workspace = true }
 aes-kw = { workspace = true }
